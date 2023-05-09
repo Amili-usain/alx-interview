@@ -1,50 +1,40 @@
-#!/usr/bin/env python3
+#!/usr/bin/python3
+"""This script reads stdin line by line and computes metrics:"""
 
-import sys
 import re
+import sys
+
+counter = 0
+file_size = 0
+statusC_counter = {200: 0, 301: 0, 400: 0,
+                   401: 0, 403: 0, 404: 0, 405: 0, 500: 0}
 
 
-def output(log: dict) -> None:
-    """
-    helper function to display stats
-    """
-    print("Total file size: {}".format(log["total_file_size"]))
-    for code in sorted(log["code_frequency"]):
-        if log["code_frequency"][code]:
-            print("{}: {}".format(code, log["code_frequency"][code]))
+def printCodes(dict, file_s):
+    """Prints the status code and the number of times they appear"""
+    print("File size: {}".format(file_s))
+    for key in sorted(dict.keys()):
+        if statusC_counter[key] != 0:
+            print("{}: {}".format(key, dict[key]))
 
 
 if __name__ == "__main__":
-    regex = re.compile(r'(\d+\.\d+\.\d+\.\d+) - \[(.+)\] '
-                       r'"GET /projects/260 HTTP/1\.1" (\d+) (\d+)')
-
-    line_count = 0
-    log = {}
-    log["total_file_size"] = 0
-    log["code_frequency"] = {
-        str(code): 0 for code in [
-            200, 301, 400, 401, 403, 404, 405, 500]}
-
     try:
         for line in sys.stdin:
-            line = line.strip()
-            match = regex.fullmatch(line)
-            if match:
-                line_count += 1
-                ip_address = match.group(1)
-                date = match.group(2)
-                status_code = match.group(3)
-                file_size = int(match.group(4))
-
-                # Total file size
-                log["total_file_size"] += file_size
-
-                # Status code
-                if status_code.isdecimal():
-                    log["code_frequency"][status_code] += 1
-
-                if line_count % 10 == 0:
-                    output(log)
-
+            split_string = re.split('- |"|"| " " ', str(line))
+            statusC_and_file_s = split_string[-1]
+            if counter != 0 and counter % 10 == 0:
+                printCodes(statusC_counter, file_size)
+            counter = counter + 1
+            try:
+                statusC = int(statusC_and_file_s.split()[0])
+                f_size = int(statusC_and_file_s.split()[1])
+                if statusC in statusC_counter:
+                    statusC_counter[statusC] += 1
+                file_size = file_size + f_size
+            except:
+                pass
+        printCodes(statusC_counter, file_size)
     except KeyboardInterrupt:
-        output(log)
+        printCodes(statusC_counter, file_size)
+        raise
