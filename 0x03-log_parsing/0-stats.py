@@ -3,6 +3,7 @@
 import sys
 import re
 
+
 def output(log: dict) -> None:
     """
     helper function to display stats
@@ -12,8 +13,10 @@ def output(log: dict) -> None:
         if log["code_frequency"][code]:
             print("{}: {}".format(code, log["code_frequency"][code]))
 
+
 if __name__ == "__main__":
-    regex = re.compile(r'(\d+\.\d+\.\d+\.\d+) - \[(.+)\] "GET /projects/260 HTTP/1\.1" (\d+) (\d+)')
+    regex = re.compile(r'(\d+\.\d+\.\d+\.\d+) - \[(.+)\] '
+                       r'"GET /projects/260 HTTP/1\.1" (\d+) (\d+)')
 
     line_count = 0
     log = {}
