@@ -12,9 +12,9 @@ const request = require('request');
  * Fetches the characters from the Star Wars API and prints their names.
  * @param {string} movieId - The ID of the Star Wars movie.
  */
-function printStarWarsCharacters(movieId) {
+function printStarWarsCharacters (movieId) {
   const url = `https://swapi-api.alx-tools.com/api/films/${movieId}/`;
-  
+
   request(url, async function (error, response, body) {
     if (error) {
       return console.log(error);
